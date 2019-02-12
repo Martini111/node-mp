@@ -1,13 +1,10 @@
 const http = require('http');
 const port = 3050;
 
-const {events, discoveries} = require('./src/data');
-const {getLeftJoinById} = require('./src/utils');
+const router = require('./src/router');
 
 const requestListener = (request, response) => {
-    const data = getLeftJoinById(events, discoveries);
-    response.writeHead(200, {'Content-Type': 'application/json'});
-    response.end(JSON.stringify(data));
+    router(request, response);
 };
 
 const server = http.createServer(requestListener);
