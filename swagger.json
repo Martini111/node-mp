@@ -1,0 +1,191 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "description": "Rest API",
+      "version": "1.0.0",
+      "title": "Rest API"
+    },
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/events": {
+        "get": {
+          "tags": [
+            "events"
+          ],
+          "summary": "Get all avaliable events",
+          "responses": {
+            "200": {
+              "description": "successful operation"
+            },
+            "400": {
+              "description": "Invalid ID supplied"
+            },
+            "404": {
+              "description": "Event not found"
+            }
+          }
+				},
+				"put": {
+          "tags": [
+            "events"
+          ],
+          "summary": "Update event by ID",
+          "description": "Updates a single event",
+          "operationId": "updateEventById",
+          "parameters": [
+						{
+							"in": "body",
+							"name": "body",
+							"description": "Updated user object",
+							"required": true,
+							"schema": {
+								"$ref": "#/definitions/Event"
+							}
+						}
+					],
+          "responses": {
+            "200": {
+							"description": "successful operation",
+							"schema": {
+								"$ref": "#/definitions/Event"
+							}
+            },
+            "400": {
+              "description": "Invalid ID supplied"
+            },
+            "404": {
+              "description": "Event not found"
+            }
+          }
+				},
+				"post": {
+          "tags": [
+            "events"
+          ],
+          "summary": "Create event",
+          "description": "Create a single event",
+          "operationId": "createEvent",
+          "parameters": [
+						{
+							"in": "body",
+							"name": "body",
+							"description": "New event object",
+							"required": true,
+							"schema": {
+								"$ref": "#/definitions/NewEvent"
+							}
+						}
+					],
+          "responses": {
+            "200": {
+							"description": "successful operation",
+							"schema": {
+								"$ref": "#/definitions/Event"
+							}
+            },
+            "400": {
+              "description": "Invalid ID supplied"
+            },
+            "404": {
+              "description": "Event not found"
+            }
+          }
+        }
+      },
+      "/events/{eventId}": {
+        "get": {
+          "tags": [
+            "events"
+          ],
+          "summary": "Find event by ID",
+          "description": "Returns a single event",
+          "operationId": "getEventById",
+          "parameters": [
+            {
+              "name": "eventId",
+              "in": "path",
+              "description": "ID of event to return",
+              "required": true,
+              "type": "string",
+              "format": "uuid"
+            }
+          ],
+          "responses": {
+            "200": {
+							"description": "successful operation",
+							"schema": {
+								"$ref": "#/definitions/Event"
+							}
+            },
+            "400": {
+              "description": "Invalid ID supplied"
+            },
+            "404": {
+              "description": "Event not found"
+            }
+          }
+				},
+				"delete": {
+          "tags": [
+            "events"
+          ],
+          "summary": "Delete event by ID",
+          "description": "Deletes a single event",
+          "operationId": "deleteEventById",
+          "parameters": [
+            {
+              "name": "eventId",
+              "in": "path",
+              "description": "ID of event to delete",
+              "required": true,
+              "type": "string",
+              "format": "uuid"
+            }
+          ],
+          "responses": {
+            "200": {
+							"description": "successful operation"
+            },
+            "400": {
+              "description": "Invalid ID supplied"
+            },
+            "404": {
+              "description": "Event not found"
+            }
+          }
+				}
+      }
+    },
+    "definitions": {
+        "Event": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "event": {
+              "type": "string",
+              "description": "Event"
+            }
+          },
+          "xml": {
+            "name": "Event"
+          }
+				},
+				"NewEvent": {
+          "type": "object",
+          "properties": {
+            "event": {
+              "type": "string",
+              "description": "Event"
+            }
+          },
+          "xml": {
+            "name": "NewEvent"
+          }
+        }
+    }
+}

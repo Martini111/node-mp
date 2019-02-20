@@ -19,5 +19,11 @@
   "homepage": "https://github.com/Martini111/node-mp#readme",
   "devDependencies": {
     "nodemon": "^1.18.9"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "swagger-ui-express": "^4.0.2",
+    "uuid": "^3.3.2"
   }
 }

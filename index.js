@@ -1,17 +1,21 @@
-const http = require('http');
+const express = require('express');
+const app = express();
 const port = 3050;
+const routes = require('./src/router');
+const bodyParser = require('body-parser');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
-const router = require('./src/router');
+app.use(bodyParser.json());
+app.use('/', routes);
+app.use((err, req, res, next)=>{
+    res.status(422).send({
+        error: err.message
+    })
+})
 
-const requestListener = (request, response) => {
-    router(request, response);
-};
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-const server = http.createServer(requestListener);
-
-server.listen(port, (err) => {
-    if (err) {
-        return console.error('Something went wrong', err);
-    }
-    console.log(`server is listening on ${port}`);
+app.listen(port, ()=>{
+    console.log(`Listening on port ${port}`)
 });
