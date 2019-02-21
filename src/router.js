@@ -8,6 +8,8 @@ const writeFile = util.promisify(require("fs").writeFile);
 const eventsPath = `${__dirname}/data/events.json`;
 const discoveriesPath = `${__dirname}/data/discoveries.json`;
 
+// Events route
+
 router.route('/events')
     .get((req, res) => {
         readFile(eventsPath, 'utf8')
@@ -56,10 +58,54 @@ router.route('/events/:id')
         .then(() => res.send(id))
     })
 
+// Discoveries route
+
 router.route('/discoveries')
     .get((req, res) => {
         readFile(discoveriesPath, 'utf8')
         .then(data => res.json(JSON.parse(data)));
-    });
+    })
+    .put((req, res) => {
+        const {id, city, venue} = req.body;
+        readFile(discoveriesPath, 'utf8')
+        .then(data => {
+            const discoveries = JSON.parse(data);
+            return discoveries.map(el => el.id === id ? {...el, city, venue} : el);
+        })
+        .then(transformedData => writeFile(discoveriesPath, JSON.stringify(transformedData), 'utf8'))
+        .then(() => res.json({id, city, venue}))
+    })
+    .post((req, res) => {
+        const {city, venue} = req.body;
+        const newDiscovery = {id: uuidv1(), city, venue};
+        readFile(discoveriesPath, 'utf8')
+        .then(data => {
+            const discoveries = JSON.parse(data);
+            return [newDiscovery, ...discoveries]
+        })
+        .then(extendedArray => writeFile(discoveriesPath, JSON.stringify(extendedArray), 'utf8'))
+        .then(() => res.json(newDiscovery))
+    })
+
+router.route('/discoveries/:id')
+    .get((req, res) => {
+        const id = req.params.id;
+        readFile(discoveriesPath, 'utf8')
+        .then(data => {
+            const events = JSON.parse(data);
+            const event = events.find(el => el.id === id);
+            res.json(event);
+        })
+    })
+    .delete((req, res) => {
+        const id = req.params.id;
+        readFile(discoveriesPath, 'utf8')
+        .then(data => {
+            const discoveries = JSON.parse(data);
+            return discoveries.filter(el => el.id !== id);
+        })
+        .then(filteredDiscoveries => writeFile(discoveriesPath, JSON.stringify(filteredDiscoveries), 'utf8'))
+        .then(() => res.send(id))
+    })
 
 module.exports = router;

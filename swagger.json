@@ -38,7 +38,7 @@
 						{
 							"in": "body",
 							"name": "body",
-							"description": "Updated user object",
+							"description": "Updated object",
 							"required": true,
 							"schema": {
 								"$ref": "#/definitions/Event"
@@ -156,6 +156,154 @@
             }
           }
 				}
+      },
+      "/discoveries": {
+        "get": {
+          "tags": [
+            "discoveries"
+          ],
+          "summary": "Get all avaliable discoveries",
+          "responses": {
+            "200": {
+              "description": "successful operation"
+            },
+            "400": {
+              "description": "Invalid ID supplied"
+            },
+            "404": {
+              "description": "Event not found"
+            }
+          }
+        },
+        "put": {
+          "tags": [
+            "discoveries"
+          ],
+          "summary": "Update discovery by ID",
+          "description": "Updates a single discovery",
+          "operationId": "updateDiscoveryById",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Updated object",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/Discovery"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "schema": {
+                "$ref": "#/definitions/Event"
+              }
+            },
+            "400": {
+              "description": "Invalid ID supplied"
+            },
+            "404": {
+              "description": "Event not found"
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "discoveries"
+          ],
+          "summary": "Create discovery",
+          "description": "Create a single discovery",
+          "operationId": "createEvent",
+          "parameters": [
+						{
+							"in": "body",
+							"name": "body",
+							"description": "New discovery object",
+							"required": true,
+							"schema": {
+								"$ref": "#/definitions/NewDiscovery"
+							}
+						}
+					],
+          "responses": {
+            "200": {
+							"description": "successful operation",
+							"schema": {
+								"$ref": "#/definitions/Discovery"
+							}
+            },
+            "400": {
+              "description": "Invalid ID supplied"
+            },
+            "404": {
+              "description": "Discovery not found"
+            }
+          }
+        }
+      },
+      "/discoveries/{discoveryId}": {
+        "get": {
+          "tags": [
+            "discoveries"
+          ],
+          "summary": "Find discovery by ID",
+          "description": "Returns a single discovery",
+          "operationId": "getDiscoveryById",
+          "parameters": [
+            {
+              "name": "discoveryId",
+              "in": "path",
+              "description": "ID of discovery to return",
+              "required": true,
+              "type": "string",
+              "format": "uuid"
+            }
+          ],
+          "responses": {
+            "200": {
+							"description": "successful operation",
+							"schema": {
+								"$ref": "#/definitions/Discovery"
+							}
+            },
+            "400": {
+              "description": "Invalid ID supplied"
+            },
+            "404": {
+              "description": "Event not found"
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "discoveries"
+          ],
+          "summary": "Delete discovery by ID",
+          "description": "Deletes a single discovery",
+          "operationId": "deleteDiscoveryById",
+          "parameters": [
+            {
+              "name": "discoveryId",
+              "in": "path",
+              "description": "ID of discovery to delete",
+              "required": true,
+              "type": "string",
+              "format": "uuid"
+            }
+          ],
+          "responses": {
+            "200": {
+							"description": "successful operation"
+            },
+            "400": {
+              "description": "Invalid ID supplied"
+            },
+            "404": {
+              "description": "Event not found"
+            }
+          }
+				}
       }
     },
     "definitions": {
@@ -181,6 +329,42 @@
             "event": {
               "type": "string",
               "description": "Event"
+            }
+          },
+          "xml": {
+            "name": "NewEvent"
+          }
+        },
+        "Discovery": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "city": {
+              "type": "string",
+              "description": "Discovery city"
+            },
+            "venue": {
+              "type": "string",
+              "description": "Discovery venue"
+            }
+          },
+          "xml": {
+            "name": "Event"
+          }
+        },
+        "NewDiscovery": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string",
+              "description": "Discovery city"
+            },
+            "venue": {
+              "type": "string",
+              "description": "Discovery venue"
             }
           },
           "xml": {
