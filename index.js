@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const port = 3050;
+const host = '0.0.0.0';
 const routes = require('./src/routes');
 const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
@@ -16,6 +17,6 @@ app.use((err, req, res, next)=>{
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.listen(port, ()=>{
-    console.log(`Listening on port ${port}`)
-});
+app.listen(port, host);
+
+console.log(`Listening on port ${port}`);
