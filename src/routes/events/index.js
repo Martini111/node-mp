@@ -1,60 +1,58 @@
 const events = require('express').Router();
-const util = require('util');
-const path = require('path');
-const uuidv4 = require('uuid/v4');
-const readFile = util.promisify(require("fs").readFile);
-const writeFile = util.promisify(require("fs").writeFile);
-const eventsPath = path.join(__dirname, '..', '..', 'data', 'events.json');
-const {transformById, findById, filterById} = require('../utils/utils');
+const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const eventScheme = require('./schemes/event');
 
-events.route('/')
-    .get((req, res) => {
-        readFile(eventsPath, 'utf8')
-            .then(data => res.json(JSON.parse(data)))
-    })
-    .put((req, res) => {
-        const {id, ...newData} = req.body;
-        const {error} = Joi.validate(req.body, eventScheme);
+const routeEvents = (db) => {
+    const eventsCollection = db.collection('events');
+    events.route('/')
+        .get((req, res) => {
+            eventsCollection.find({}).toArray()
+                .then((data) => res.json(data))
+        })
+        .put((req, res) => {
+            const {id, ...newData} = req.body;
+            const {error} = Joi.validate(req.body, eventScheme);
 
-        if (error) {
-            res.status(405).send(error);
-            return;
-        }
+            if (error) {
+                res.status(405).send(error);
+                return;
+            }
 
-        readFile(eventsPath, 'utf8')
-            .then(data => writeFile(eventsPath, JSON.stringify(transformById(id, JSON.parse(data), newData)), 'utf8'))
-            .then(() => res.json({id, ...newData}))
-    })
-    .post((req, res) => {
-        const newEvent = {id: uuidv4(), ...req.body};
+            eventsCollection.findOneAndUpdate({_id: new ObjectID(id)}, {$set: newData}, {returnOriginal: false})
+                .then((data) => {
+                    res.json(data.value);
+                })
+        })
+        .post((req, res) => {
+            const {error} = Joi.validate(req.body, eventScheme);
 
-        const {error} = Joi.validate(req.body, eventScheme);
+            if (error) {
+                res.status(405).send(error);
+                return;
+            }
 
-        if (error) {
-            res.status(405).send(error);
-            return;
-        }
+            eventsCollection.insert(req.body)
+                .then((data) => {
+                    res.json(data.ops[0])
+                })
+        })
 
-        readFile(eventsPath, 'utf8')
-            .then(data => [newEvent, ...JSON.parse(data)])
-            .then(extendedArray =>
-                writeFile(eventsPath, JSON.stringify(extendedArray), 'utf8'))
-            .then(() => res.json(newEvent))
-    })
-
-events.route('/:id')
-    .get((req, res) => {
-        readFile(eventsPath, 'utf8')
-            .then(data => res.json(findById(req.params.id, JSON.parse(data))));
-    })
-    .delete((req, res) => {
-        const id = req.params.id;
-        readFile(eventsPath, 'utf8')
-            .then(data =>
-                writeFile(eventsPath, JSON.stringify(filterById(id, JSON.parse(data))), 'utf8'))
+    events.route('/:id')
+        .get((req, res) => {
+            const {id} = req.params;
+            eventsCollection.findOne({_id: new ObjectID(id)})
+            .then((data) => res.json(data))
+        })
+        .delete((req, res) => {
+            const {id} = req.params;
+            eventsCollection.remove({_id: new ObjectID(id)}, true)
             .then(() => res.send(id))
-    });
+        });
 
-module.exports = events;
+    return events;
+}
+
+module.exports = {
+    routeEvents
+};

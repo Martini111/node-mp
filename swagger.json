@@ -108,8 +108,7 @@
               "in": "path",
               "description": "ID of event to return",
               "required": true,
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           ],
           "responses": {
@@ -140,8 +139,7 @@
               "in": "path",
               "description": "ID of event to delete",
               "required": true,
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           ],
           "responses": {
@@ -256,8 +254,7 @@
               "in": "path",
               "description": "ID of discovery to return",
               "required": true,
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           ],
           "responses": {
@@ -288,8 +285,7 @@
               "in": "path",
               "description": "ID of discovery to delete",
               "required": true,
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           ],
           "responses": {

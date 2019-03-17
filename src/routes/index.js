@@ -1,9 +1,13 @@
 const routes = require('express').Router();
 
-const events = require('./events');
+const events = require('./events').routeEvents;
 const discoveries = require('./discoveries');
 
-routes.use('/events', events);
-routes.use('/discoveries', discoveries);
+module.exports = {
+    routes(db) {
+        routes.use('/events', events(db));
+        routes.use('/discoveries', discoveries);
 
-module.exports = routes;
+        return routes;
+    }
+};
