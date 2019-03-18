@@ -25,7 +25,9 @@
     "express": "^4.16.4",
     "joi": "^14.3.1",
     "joi-to-swagger": "^3.1.0",
+    "joigoose": "^4.0.4",
     "mongodb": "^3.1.13",
+    "mongoose": "^5.4.19",
     "swagger-ui-express": "^4.0.2",
     "uuid": "^3.3.2"
   }

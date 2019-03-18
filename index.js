@@ -2,34 +2,27 @@ const express = require('express');
 const app = express();
 const port = 3050;
 const host = '0.0.0.0';
-const routes = require('./src/routes').routes;
+const routes = require('./src/routes');
 const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
-const mongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
 
 var j2s = require('joi-to-swagger');
 const eventsSchema = require('./src/routes/events/schemes/event');
 const discoveriesSchema = require('./src/routes/discoveries/schemes/discovery');
 
 app.use(bodyParser.json());
+app.use('/', routes);
 app.use((err, req, res, next)=>{
     res.status(422).send({
         error: err.message
     })
 });
 
-mongoClient
-    .connect(
-        'mongodb://mongo:27017/events-discoveries',
-        {useNewUrlParser: true}
-    )
-    .then((client) => {
-        console.log('MongoDB Connected')
-        const db = client.db();
-        app.use('/', routes(db));
-    })
-    .catch(err => console.log(err));
+
+mongoose.connect('mongodb://mongo:27017/events-discoveries', {useNewUrlParser: true});
+
 
 const withoutId = (schema) => {
     const {id, ...restProps} = schema.properties;
