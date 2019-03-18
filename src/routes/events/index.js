@@ -20,9 +20,7 @@ const routeEvents = (db) => {
             }
 
             eventsCollection.findOneAndUpdate({_id: new ObjectID(id)}, {$set: newData}, {returnOriginal: false})
-                .then((data) => {
-                    res.json(data.value);
-                })
+                .then((data) => res.json(data.value))
         })
         .post((req, res) => {
             const {error} = Joi.validate(req.body, eventScheme);
@@ -51,7 +49,7 @@ const routeEvents = (db) => {
         });
 
     return events;
-}
+};
 
 module.exports = {
     routeEvents

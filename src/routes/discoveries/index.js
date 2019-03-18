@@ -1,61 +1,57 @@
 const discoveries = require('express').Router();
-const util = require('util');
-const path = require('path');
-const uuidv4 = require('uuid/v4');
-const readFile = util.promisify(require("fs").readFile);
-const writeFile = util.promisify(require("fs").writeFile);
-const discoveriesPath = path.join(__dirname, '..', '..', 'data', 'discoveries.json');
-const {transformById, findById, filterById} = require('../utils/utils');
+const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const discoveryScheme = require('./schemes/discovery');
 
-discoveries.route('/')
-    .get((req, res) => {
-        readFile(discoveriesPath, 'utf8')
-            .then(data => res.json(JSON.parse(data)))
-    })
-    .put((req, res) => {
-        const {id, ...newData} = req.body;
+const routeDiscoveries = (db) => {
+    const discoveriesCollection = db.collection('discoveries');
+    discoveries.route('/')
+        .get((req, res) => {
+            discoveriesCollection.find({}).toArray()
+                .then((data) => res.json(data))
+        })
+        .put((req, res) => {
+            const {id, ...newData} = req.body;
 
-        const {error} = Joi.validate(req.body, discoveryScheme);
+            const {error} = Joi.validate(req.body, discoveryScheme);
 
-        if (error) {
-            res.status(405).send(error);
-            return;
-        }
+            if (error) {
+                res.status(405).send(error);
+                return;
+            }
 
-        readFile(discoveriesPath, 'utf8')
-            .then(data => writeFile(discoveriesPath, JSON.stringify(transformById(id, JSON.parse(data), newData)), 'utf8'))
-            .then(() => res.json({id, ...newData}))
-    })
-    .post((req, res) => {
-        const newDiscovery = {id: uuidv4(), ...req.body};
+            discoveriesCollection.findOneAndUpdate({_id: new ObjectID(id)}, {$set: newData}, {returnOriginal: false})
+                .then((data) => res.json(data.value))
+        })
+        .post((req, res) => {
+            const {error} = Joi.validate(req.body, discoveryScheme);
 
-        const {error} = Joi.validate(req.body, discoveryScheme);
+            if (error) {
+                res.status(405).send(error);
+                return;
+            }
 
-        if (error) {
-            res.status(405).send(error);
-            return;
-        }
+            discoveriesCollection.insert(req.body)
+                .then((data) => {
+                    res.json(data.ops[0])
+                })
+        })
 
-        readFile(discoveriesPath, 'utf8')
-            .then(data => [newDiscovery, ...JSON.parse(data)])
-            .then(extendedArray =>
-                writeFile(discoveriesPath, JSON.stringify(extendedArray), 'utf8'))
-            .then(() => res.json(newDiscovery))
-    })
-
-discoveries.route('/:id')
-    .get((req, res) => {
-        readFile(discoveriesPath, 'utf8')
-            .then(data => res.json(findById(req.params.id, JSON.parse(data))));
-    })
-    .delete((req, res) => {
-        const id = req.params.id;
-        readFile(discoveriesPath, 'utf8')
-            .then(data =>
-                writeFile(discoveriesPath, JSON.stringify(filterById(id, JSON.parse(data))), 'utf8'))
+    discoveries.route('/:id')
+        .get((req, res) => {
+            const {id} = req.params;
+            discoveriesCollection.findOne({_id: new ObjectID(id)})
+            .then((data) => res.json(data))
+        })
+        .delete((req, res) => {
+            const {id} = req.params;
+            discoveriesCollection.remove({_id: new ObjectID(id)}, true)
             .then(() => res.send(id))
-    });
+        });
 
-module.exports = discoveries;
+    return discoveries;
+};
+
+module.exports = {
+    routeDiscoveries
+};

@@ -21,7 +21,7 @@ app.use((err, req, res, next)=>{
 
 mongoClient
     .connect(
-        'mongodb://localhost:27017/events-discoveries',
+        'mongodb://mongo:27017/events-discoveries',
         {useNewUrlParser: true}
     )
     .then((client) => {
